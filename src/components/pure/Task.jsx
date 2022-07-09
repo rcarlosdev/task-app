@@ -2,8 +2,54 @@ import React from "react";
 import "../../styles/task.scss";
 import PropTypes from "prop-types";
 import { Task } from "../../models/task.class";
+import { LEVELS } from "../../models/levels.enum";
 
-function TaskComponent({ task }) {
+function TaskComponent({ task, completedTask, deleteTask }) {
+    const taskLevelBadge = () => {
+        switch (task.level) {
+            case LEVELS.NORMAL:
+                return (
+                    <h6 className="mb-0">
+                        <span className="badge bg-primary">{task.level}</span>
+                    </h6>
+                );
+            case LEVELS.URGENTE:
+                return (
+                    <h6 className="mb-0">
+                        <span className="badge bg-warning">{task.level}</span>
+                    </h6>
+                );
+            case LEVELS.BLOCKING:
+                return (
+                    <h6 className="mb-0">
+                        <span className="badge bg-danger">{task.level}</span>
+                    </h6>
+                );
+            default:
+                break;
+        }
+    };
+
+    const taskCompletedIcon = () => {
+        if (task.completed) {
+            return (
+                <i
+                    className="bi bi-toggle-on task-action"
+                    onClick={() => completedTask(task)}
+                    style={{ color: "green" }}
+                ></i>
+            );
+        } else {
+            return (
+                <i
+                    className="bi bi-toggle-off task-action"
+                    onClick={() => completedTask(task)}
+                    style={{ color: "gray" }}
+                ></i>
+            );
+        }
+    };
+
     return (
         <tr className="fw-normal">
             <td className="align-middle">
@@ -12,18 +58,19 @@ function TaskComponent({ task }) {
             <td className="align-middle">
                 <span>{task.description}</span>
             </td>
+            <td className="align-middle">{taskLevelBadge()}</td>
             <td className="align-middle">
-                <span>{task.level}</span>
-            </td>
-            <td className="align-middle">
-                <span>{task.completed ? "COMPLETED" : "PENDING"}</span>
+                {taskCompletedIcon()}
+                <i className="bi bi-trash task-action" onClick={() => deleteTask(task)} style={{ color: "tomato" }}></i>
             </td>
         </tr>
     );
 }
 
 TaskComponent.propTypes = {
-    task: PropTypes.instanceOf(Task),
+    task: PropTypes.instanceOf(Task).isRequired,
+    completedTask: PropTypes.func.isRequired,
+    deleteTask: PropTypes.func.isRequired,
 };
 
 export default TaskComponent;

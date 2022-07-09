@@ -1,7 +1,6 @@
 import "./App.css";
 import TaskListComponent from "./components/container/TaskList";
 
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
     return (
