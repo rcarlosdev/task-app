@@ -1,11 +1,14 @@
 import "./App.css";
 import TaskListComponent from "./components/container/TaskList";
-
+import LoginForm from "./components/pure/forms/LoginForm";
+import RegisterForm from "./components/pure/forms/RegisterForm";
 
 function App() {
     return (
         <div className="App">
-            <TaskListComponent />
+            <LoginForm />
+            <RegisterForm />
+            {/* <TaskListComponent /> */}
         </div>
     );
 }
