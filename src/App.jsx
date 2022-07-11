@@ -6,9 +6,9 @@ import RegisterForm from "./components/pure/forms/RegisterForm";
 function App() {
     return (
         <div className="App">
-            <LoginForm />
-            <RegisterForm />
-            {/* <TaskListComponent /> */}
+            {/* <LoginForm /> */}
+            {/* <RegisterForm /> */}
+            <TaskListComponent />
         </div>
     );
 }

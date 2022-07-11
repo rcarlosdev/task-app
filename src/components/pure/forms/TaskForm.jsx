@@ -1,71 +1,124 @@
 import { useRef } from "react";
 import PropTypes from "prop-types";
+
+import * as yup from "yup";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+
 import { Task } from "../../../models/task.class";
 import { LEVELS } from "../../../models/levels.enum";
 
 function TaskForm({ add, tasksLength }) {
-    const nameRef = useRef("");
-    const descriptionRef = useRef("");
-    const levelRef = useRef(LEVELS.NORMAL);
+    const validationSchema = yup.object({
+        name: yup.string().required("Name is required"),
+        description: yup.string().required("Description is required"),
+        level: yup
+            .string()
+            .oneOf(
+                [LEVELS.NORMAL, LEVELS.URGENT, LEVELS.BLOCKING],
+                "You must select a level: Normal, Urgent or Blocking"
+            )
+            .required("Level is required"),
+    });
 
-    const addTask = (e) => {
-        e.preventDefault();
+    const initialValues = {
+        name: "",
+        description: "",
+        level: LEVELS.NORMAL,
+    };
+
+    const addTask = (values) => {
         const newTask = new Task(
-            nameRef.current.value,
-            descriptionRef.current.value,
+            values.name,
+            values.description,
             false,
-            levelRef.current.value
+            values.level
         );
         add(newTask);
 
-        nameRef.current.value = "";
-        descriptionRef.current.value = "";
-        levelRef.current.value = LEVELS.NORMAL;
+        values.name = "";
+        values.description = "";
+        values.level = LEVELS.NORMAL;
     };
 
     return (
-        <form
-            onSubmit={addTask}
-            className="d-flex justify-content-center align-items-center"
-        >
-            <div className="form-outline flex-fill">
-                <input
-                    type="text"
-                    id="inputName"
-                    className="form-control form-control-sm"
-                    ref={nameRef}
-                    placeholder="Name"
-                    required
-                    autoFocus
-                />
+        <div>
+            <Formik
+                initialValues={initialValues}
+                validationSchema={validationSchema}
+                onSubmit={(values, actions) => {
+                    setTimeout(() => {
+                        addTask(values);
+                        actions.setSubmitting(false);
+                    }, 1000);
+                }}
+            >
+                {({
+                    values,
+                    errors,
+                    touched,
+                    isSubmitting,
+                    handleChange,
+                    handleBlurt,
+                }) => (
+                    <Form>
+                        <div>
+                            <Field
+                                id="name"
+                                name="name"
+                                type="text"
+                                placeholder="Name"
+                                autoComplete="off"
+                            />
+                            {errors.name && touched.name && (
+                                <ErrorMessage name="name" component="div" />
+                            )}
+                        </div>
+                        <div>
+                            <Field
+                                id="description"
+                                name="description"
+                                type="text"
+                                placeholder="Description"
+                                autoComplete="off"
+                            />
+                            {errors.description && touched.description && (
+                                <ErrorMessage
+                                    name="description"
+                                    component="div"
+                                />
+                            )}
+                        </div>
 
-                <input
-                    type="text"
-                    id="inputDescription"
-                    className="form-control form-control-sm"
-                    placeholder="Description"
-                    ref={descriptionRef}
-                    required
-                />
-
-                <select
-                    id="selectLevel"
-                    className="form-select form-select-sm"
-                    defaultValue={LEVELS.NORMAL}
-                    ref={levelRef}
-                >
-                    <option value={LEVELS.NORMAL}>Normal</option>
-                    <option value={LEVELS.URGENT}>Urgent</option>
-                    <option value={LEVELS.BLOCKING}>Blocking</option>
-                </select>
-                <button
-                    type="submit"
-                    className="btn btn-success btn-sm ms-2    "
-                >
-                    {tasksLength === 0 ? "Add Your First Task" : "Add New Task"}
-                </button>
-            </div>
-        </form>
+                        <div>
+                            <Field as="select" id="level" name="level">
+                                <option value={LEVELS.NORMAL}>Normal</option>
+                                <option value={LEVELS.URGENT}>Urgent</option>
+                                <option value={LEVELS.BLOCKING}>
+                                    Blocking
+                                </option>
+                            </Field>
+                            {errors.level && touched.level && (
+                                <ErrorMessage name="level" component="div" />
+                            )}
+                        </div>
+                        <div>
+                            {isSubmitting ? (
+                                <p>Adding task...</p>
+                            ) : (
+                                <button
+                                    type="submit"
+                                    className="btn btn-success btn-sm"
+                                >
+                                    {tasksLength === 0
+                                        ? "Add Your First Task"
+                                        : "Add New Task"}
+                                </button>
+                            )}
+                        </div>
+                    </Form>
+                )}
+            </Formik>
+        </div>
     );
 }
 
